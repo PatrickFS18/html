@@ -119,30 +119,37 @@
       <div id="sidebar" class="collapsed">
          <h2 class="mb-4">Controles</h2>
          <!-- Cabeçalho -->
+         <!-- Explicação: Cada input define as caracteristicas do elemento a editar  -->
          <div class="form-section">
             <h5 onclick="toggleSection(this)">Cabeçalho</h5>
             <div class="section-content">
                <div class="mb-3">
+                  <!-- Título -->
                   <label class="form-label">Texto do cabeçalho</label>
                   <input type="text" id="headerText" class="form-control" placeholder="Texto do cabeçalho">
                </div>
                <div class="mb-3">
+                  <!-- Imagem -->
                   <label class="form-label">Imagem do cabeçalho</label>
                   <input type="file" id="headerImg" class="form-control" accept="image/*">
                </div>
                <div class="mb-3">
+                  <!-- Cor de fundo -->
                   <label class="color-label">Cor de fundo</label>
                   <input type="color" id="headerBg" class="form-control form-control-color" value="#ffffff">
                </div>
                <div class="mb-3">
+                  <!-- Cor do texto -->
                   <label class="color-label">Cor do texto</label>
                   <input type="color" id="headerTextColor" class="form-control form-control-color" value="#000000">
                </div>
                <div class="mb-3">
+                  <!-- Font size -->
                   <label class="form-label">Tamanho do texto</label>
                   <input type="number" id="headerFontSize" class="form-control" value="30" min="8" max="72">
                </div>
                <div class="mb-3">
+                  <!-- Borda -->
                   <label class="form-label">Borda</label>
                   <select id="headerBorder" class="form-select">
                      <option value="none">Sem borda</option>
@@ -151,6 +158,7 @@
                   </select>
                </div>
                <div class="mb-3">
+                  <!-- Alinhamento -->
                   <label class="form-label">Alinhamento</label>
                   <select id="headerAlign" class="form-select">
                      <option value="center">Centralizado</option>
@@ -195,90 +203,81 @@
                   <input type="color" id="galleryCardBg" class="form-control form-control-color" value="#ffffff">
                </div>
                <div class="mb-3">
-               <label class="color-label mt-2">Cor do texto dos cards</label>
-                    <input type="color" id="galleryTextColor" class="form-control form-control-color" value="#000000">
+                  <label class="color-label mt-2">Cor do texto dos cards</label>
+                  <input type="color" id="galleryTextColor" class="form-control form-control-color" value="#000000">
                </div>
-            
-            <div class="mb-3">
-                <label class="color-label mt-2">Cor da borda dos cards</label>
-                <input type="color" id="galleryBorderColor" class="form-control form-control-color" value="#cccccc">
-                </div>
-                
-                <!-- Novo: Tamanho da fonte -->
-                <div class="mb-3">
-                
-                <label class="form-label mt-2">Tamanho da fonte (px)</label>
-                <input type="number" id="galleryFontSize" class="form-control" value="14">
-                </div>
-                
-                <!-- Novo: Padding interno -->
-                <div class="mb-3">
-                
-                <label class="form-label mt-2">Espaçamento interno (padding px)</label>
-                <input type="number" id="galleryPadding" class="form-control" value="10">
-                </div>
+               <div class="mb-3">
+                  <label class="color-label mt-2">Cor da borda dos cards</label>
+                  <input type="color" id="galleryBorderColor" class="form-control form-control-color" value="#cccccc">
+               </div>
+               <!-- Novo: Tamanho da fonte -->
+               <div class="mb-3">
+                  <label class="form-label mt-2">Tamanho da fonte (px)</label>
+                  <input type="number" id="galleryFontSize" class="form-control" value="14">
+               </div>
+               <!-- Novo: Padding interno -->
+               <div class="mb-3">
+                  <label class="form-label mt-2">Espaçamento interno (padding px)</label>
+                  <input type="number" id="galleryPadding" class="form-control" value="10">
+               </div>
             </div>
          </div>
-              <!-- Cabeçalho -->
-              <div class="form-section">
-                <h5 onclick="toggleSection(this)">Formulário</h5>
-                <div class="section-content">
-                  <!-- Título do formulário -->
-                  <div class="mb-3">
-                    <label class="form-label">Título do formulário</label>
-                    <input type="text" id="formTitle" class="form-control" placeholder="Título do formulário">
+         <!-- Cabeçalho -->
+         <div class="form-section">
+            <h5 onclick="toggleSection(this)">Formulário</h5>
+            <div class="section-content">
+               <!-- Título do formulário -->
+               <div class="mb-3">
+                  <label class="form-label">Título do formulário</label>
+                  <input type="text" id="formTitle" class="form-control" placeholder="Título do formulário">
+               </div>
+               <!-- Campos do formulário -->
+               <div class="mb-3">
+                  <label class="form-label">Campos do formulário</label>
+                  <div id="formFieldsContainer">
+                     <!-- Campos serão adicionados dinamicamente aqui -->
                   </div>
-              
-                  <!-- Campos do formulário -->
-                  <div class="mb-3">
-                    <label class="form-label">Campos do formulário</label>
-                    <div id="formFieldsContainer">
-                      <!-- Campos serão adicionados dinamicamente aqui -->
-                    </div>
-                    <button class="btn btn-sm btn-primary mt-2" onclick="addFormField()">Adicionar Campo</button>
+                  <button class="btn btn-sm btn-primary mt-2" onclick="addFormField()">Adicionar Campo</button>
+               </div>
+               <!-- Estilo do formulário (cor de fundo) -->
+               <div class="mb-3">
+                  <label class="color-label">Cor de fundo do formulário</label>
+                  <input type="color" id="formBgColor" class="form-control form-control-color" value="#f8f9fa">
+               </div>
+               <!-- Estilo dos labels -->
+               <h6 class="mt-3">Estilo dos Labels</h6>
+               <div class="row g-2">
+                  <div class="col-md-4">
+                     <label>Cor do texto</label>
+                     <input type="color" id="labelTextColor" class="form-control form-control-color" value="#000000">
                   </div>
-              
-                  <!-- Estilo do formulário (cor de fundo) -->
-                  <div class="mb-3">
-                    <label class="color-label">Cor de fundo do formulário</label>
-                    <input type="color" id="formBgColor" class="form-control form-control-color" value="#f8f9fa">
+                  <div class="col-md-4">
+                     <label>Tamanho da fonte (px)</label>
+                     <input type="number" id="labelFontSize" class="form-control" value="14">
                   </div>
-              
-                  <!-- Estilo dos labels -->
-                  <h6 class="mt-3">Estilo dos Labels</h6>
-                  <div class="row g-2">
-                    <div class="col-md-4">
-                      <label>Cor do texto</label>
-                      <input type="color" id="labelTextColor" class="form-control form-control-color" value="#000000">
-                    </div>
-                    <div class="col-md-4">
-                      <label>Tamanho da fonte (px)</label>
-                      <input type="number" id="labelFontSize" class="form-control" value="14">
-                    </div>
+               </div>
+               <!-- Estilo dos inputs -->
+               <h6 class="mt-4">Estilo dos Campos</h6>
+               <div class="row g-2">
+                  <div class="col-md-3">
+                     <label>Cor de fundo</label>
+                     <input type="color" id="inputBgColor" class="form-control form-control-color" value="#ffffff">
                   </div>
-              
-                  <!-- Estilo dos inputs -->
-                  <h6 class="mt-4">Estilo dos Campos</h6>
-                  <div class="row g-2">
-                    <div class="col-md-3">
-                      <label>Cor de fundo</label>
-                      <input type="color" id="inputBgColor" class="form-control form-control-color" value="#ffffff">
-                    </div>
-                    <div class="col-md-3">
-                      <label>Cor do texto</label>
-                      <input type="color" id="inputTextColor" class="form-control form-control-color" value="#000000">
-                    </div>
-                    <div class="col-md-3">
-                      <label>Cor da borda</label>
-                      <input type="color" id="inputBorderColor" class="form-control form-control-color" value="#cccccc">
-                    </div>
-                    <div class="col-md-3">
-                      <label>Tamanho da fonte (px)</label>
-                      <input type="number" id="inputFontSize" class="form-control" value="14">
-                    </div>
+                  <div class="col-md-3">
+                     <label>Cor do texto</label>
+                     <input type="color" id="inputTextColor" class="form-control form-control-color" value="#000000">
                   </div>
-                </div>
-              </div>
+                  <div class="col-md-3">
+                     <label>Cor da borda</label>
+                     <input type="color" id="inputBorderColor" class="form-control form-control-color" value="#cccccc">
+                  </div>
+                  <div class="col-md-3">
+                     <label>Tamanho da fonte (px)</label>
+                     <input type="number" id="inputFontSize" class="form-control" value="14">
+                  </div>
+               </div>
+            </div>
+         </div>
          <!-- Rodapé -->
          <div class="form-section">
             <h5 onclick="toggleSection(this)">Rodapé</h5>
@@ -455,7 +454,7 @@
             const galBorderColor = document.getElementById('galleryBorderColor')?.value || '#cccccc';
             const galFontSize = document.getElementById('galleryFontSize')?.value || '14';
             const galPadding = document.getElementById('galleryPadding')?.value || '10';
-
+         
             if (galStr) {
             html += '<section class="d-flex flex-wrap gap-3 mt-3">';
             galStr.split(';').forEach(card => {
@@ -469,7 +468,7 @@
             });
             html += '</section>';
             }
-
+         
          
            // Formulário
            const formTitle = document.getElementById('formTitle').value.trim();
@@ -485,16 +484,16 @@
          
              const labelTextColor = document.getElementById('labelTextColor')?.value || '#000000';
                 const labelFontSize = document.getElementById('labelFontSize')?.value || '14';
-
+         
                 const inputBgColor = document.getElementById('inputBgColor')?.value || '#ffffff';
                 const inputTextColor = document.getElementById('inputTextColor')?.value || '#000000';
                 const inputBorderColor = document.getElementById('inputBorderColor')?.value || '#cccccc';
                 const inputFontSize = document.getElementById('inputFontSize')?.value || '14';
-
+         
                 formFields.forEach(field => {
                 const labelStyle = `color:${labelTextColor}; font-size:${labelFontSize}px;`;
                 const inputStyle = `background:${inputBgColor}; color:${inputTextColor}; border:1px solid ${inputBorderColor}; font-size:${inputFontSize}px;`;
-
+         
                 if (field.type === 'textarea') {
                     html += `
                     <div class='mb-2'>
@@ -583,14 +582,14 @@
          }
          };
          localStorage.setItem('paginaHTML', JSON.stringify(data));
-
+         
          // Exibir sucesso
-
+         
          alert("Html salvo com sucesso.");
          }
          
          // Carrega localStorage
-
+         
          function carregarLocal() {
          const salvo = localStorage.getItem('paginaHTML');
          if (salvo) {
@@ -620,7 +619,7 @@
             document.getElementById('galleryBorderColor').value = s.galleryBorderColor;
             document.getElementById('galleryFontSize').value = s.galleryFontSize;
             document.getElementById('galleryPadding').value = s.galleryPadding;
-
+         
            document.getElementById('galleryItems').value = s.galleryItems;
            document.getElementById('galleryCardBg').value = s.galleryCardBg;
          
@@ -632,14 +631,14 @@
             document.getElementById('inputTextColor').value = s.inputTextColor;
             document.getElementById('inputBorderColor').value = s.inputBorderColor;
             document.getElementById('inputFontSize').value = s.inputFontSize;
-
+         
            document.getElementById('footerText').value = s.footerText;
            document.getElementById('footerBgColor').value = s.footerBgColor;
            document.getElementById('footerFontColor').value = s.footerFontColor;
            document.getElementById('footerAlign').value = s.footerAlign;
          }
          // Formatação feita para o formato correto
-
+         
          document.getElementById('preview').innerHTML = data.html
            .replace(/^[\s\S]*<body>/i, '')
            .replace(/<\/body>[\s\S]*$/i, '');
