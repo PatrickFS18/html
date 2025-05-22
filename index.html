@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Editor de Páginas HTML</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <style>
+         body {
+         font-family: 'Segoe UI', sans-serif;
+         margin: 0;
+         padding: 0;
+         display: flex;
+         min-height: 100vh;
+         background-color: #f2f2f2;
+         }
+         #sidebar {
+         width: 400px;
+         background: #ffffff;
+         padding: 20px;
+         box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+         overflow-y: auto;
+         transition: all 0.3s;
+         }
+         #sidebar.collapsed {
+         margin-left: -380px;
+         }
+         #main-content {
+         flex: 1;
+         display: flex;
+         flex-direction: column;
+         padding: 20px;
+         }
+         #preview-container {
+         flex: 1;
+         background: white;
+         border-radius: 8px;
+         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+         margin-bottom: 20px;
+         overflow: auto;
+         }
+         #preview {
+         min-height: 100%;
+         padding: 20px;
+         }
+         #codigoHtml {
+         width: 100%;
+         min-height: 200px;
+         font-family: monospace;
+         }
+         .form-section {
+         margin-bottom: 2rem;
+         border-bottom: 1px solid #eee;
+         padding-bottom: 1rem;
+         }
+         .form-section h5 {
+         cursor: pointer;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         }
+         .form-section h5::after {
+         content: "+";
+         }
+         .form-section.expanded h5::after {
+         content: "−";
+         }
+         .form-section .section-content {
+         display: none;
+         }
+         .form-section.expanded .section-content {
+         display: block;
+         }
+         .color-label {
+         font-size: 0.8rem;
+         margin-bottom: 0.2rem;
+         color: #666;
+         }
+         .menu-item {
+         margin-right: 10px;
+         padding: 5px 10px;
+         cursor: pointer;
+         transition: all 0.2s;
+         }
+         .menu-item:hover {
+         background-color: rgba(0,0,0,0.1);
+         border-radius: 4px;
+         }
+         .form-field {
+         display: flex;
+         gap: 10px;
+         margin-bottom: 10px;
+         align-items: center;
+         }
+         .form-field select {
+         flex: 1;
+         }
+         .form-field input {
+         flex: 2;
+         }
+         .toggle-sidebar {
+         position: fixed;
+         left: 10px;
+         top: 10px;
+         opacity: 0.4;
+         z-index: 1000;
+         }
+         .update-btn {
+         position: fixed;
+         right: 30px;
+         bottom: 30px;
+         z-index: 1000;
+         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+         }
+      </style>
+   </head>
+   <body>
+      <button class="btn btn-secondary toggle-sidebar" onclick="toggleSidebar()">☰</button>
+      <div id="sidebar" class="collapsed">
+         <h2 class="mb-4">Controles</h2>
+         <!-- Cabeçalho -->
+         <div class="form-section">
+            <h5 onclick="toggleSection(this)">Cabeçalho</h5>
+            <div class="section-content">
+               <div class="mb-3">
+                  <label class="form-label">Texto do cabeçalho</label>
+                  <input type="text" id="headerText" class="form-control" placeholder="Texto do cabeçalho">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Imagem do cabeçalho</label>
+                  <input type="file" id="headerImg" class="form-control" accept="image/*">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor de fundo</label>
+                  <input type="color" id="headerBg" class="form-control form-control-color" value="#ffffff">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor do texto</label>
+                  <input type="color" id="headerTextColor" class="form-control form-control-color" value="#000000">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Tamanho do texto</label>
+                  <input type="number" id="headerFontSize" class="form-control" value="30" min="8" max="72">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Borda</label>
+                  <select id="headerBorder" class="form-select">
+                     <option value="none">Sem borda</option>
+                     <option value="1px solid #000">Borda Preta</option>
+                     <option value="2px dashed #007bff">Borda Azul Pontilhada</option>
+                  </select>
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Alinhamento</label>
+                  <select id="headerAlign" class="form-select">
+                     <option value="center">Centralizado</option>
+                     <option value="left">Esquerda</option>
+                     <option value="right">Direita</option>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <!-- Menu -->
+         <div class="form-section">
+            <h5 onclick="toggleSection(this)">Menu</h5>
+            <div class="section-content">
+               <div class="mb-3">
+                  <label class="form-label">Logo do menu</label>
+                  <input type="file" id="menuImg" class="form-control" accept="image/*">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Itens do menu (separados por vírgula)</label>
+                  <input type="text" id="menuItems" class="form-control" placeholder="Item1, Item 2,Item 3">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor de fundo</label>
+                  <input type="color" id="menuBgColor" class="form-control form-control-color" value="#343a40">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor do texto</label>
+                  <input type="color" id="menuTextColor" class="form-control form-control-color" value="#ffffff">
+               </div>
+            </div>
+         </div>
+         <!-- Galeria -->
+         <div class="form-section">
+            <h5 onclick="toggleSection(this)">Galeria</h5>
+            <div class="section-content">
+               <div class="mb-3">
+                  <label class="form-label">Itens da galeria (URL|Descrição separados por ;)</label>
+                  <textarea id="galleryItems" class="form-control" rows="3" placeholder="url|descrição;url|descrição..."></textarea>
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor de fundo dos cards</label>
+                  <input type="color" id="galleryCardBg" class="form-control form-control-color" value="#ffffff">
+               </div>
+               <div class="mb-3">
+               <label class="color-label mt-2">Cor do texto dos cards</label>
+                    <input type="color" id="galleryTextColor" class="form-control form-control-color" value="#000000">
+               </div>
+            
+            <div class="mb-3">
+                <label class="color-label mt-2">Cor da borda dos cards</label>
+                <input type="color" id="galleryBorderColor" class="form-control form-control-color" value="#cccccc">
+                </div>
+                
+                <!-- Novo: Tamanho da fonte -->
+                <div class="mb-3">
+                
+                <label class="form-label mt-2">Tamanho da fonte (px)</label>
+                <input type="number" id="galleryFontSize" class="form-control" value="14">
+                </div>
+                
+                <!-- Novo: Padding interno -->
+                <div class="mb-3">
+                
+                <label class="form-label mt-2">Espaçamento interno (padding px)</label>
+                <input type="number" id="galleryPadding" class="form-control" value="10">
+                </div>
+            </div>
+         </div>
+              <!-- Cabeçalho -->
+              <div class="form-section">
+                <h5 onclick="toggleSection(this)">Formulário</h5>
+                <div class="section-content">
+                  <!-- Título do formulário -->
+                  <div class="mb-3">
+                    <label class="form-label">Título do formulário</label>
+                    <input type="text" id="formTitle" class="form-control" placeholder="Título do formulário">
+                  </div>
+              
+                  <!-- Campos do formulário -->
+                  <div class="mb-3">
+                    <label class="form-label">Campos do formulário</label>
+                    <div id="formFieldsContainer">
+                      <!-- Campos serão adicionados dinamicamente aqui -->
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="addFormField()">Adicionar Campo</button>
+                  </div>
+              
+                  <!-- Estilo do formulário (cor de fundo) -->
+                  <div class="mb-3">
+                    <label class="color-label">Cor de fundo do formulário</label>
+                    <input type="color" id="formBgColor" class="form-control form-control-color" value="#f8f9fa">
+                  </div>
+              
+                  <!-- Estilo dos labels -->
+                  <h6 class="mt-3">Estilo dos Labels</h6>
+                  <div class="row g-2">
+                    <div class="col-md-4">
+                      <label>Cor do texto</label>
+                      <input type="color" id="labelTextColor" class="form-control form-control-color" value="#000000">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Tamanho da fonte (px)</label>
+                      <input type="number" id="labelFontSize" class="form-control" value="14">
+                    </div>
+                  </div>
+              
+                  <!-- Estilo dos inputs -->
+                  <h6 class="mt-4">Estilo dos Campos</h6>
+                  <div class="row g-2">
+                    <div class="col-md-3">
+                      <label>Cor de fundo</label>
+                      <input type="color" id="inputBgColor" class="form-control form-control-color" value="#ffffff">
+                    </div>
+                    <div class="col-md-3">
+                      <label>Cor do texto</label>
+                      <input type="color" id="inputTextColor" class="form-control form-control-color" value="#000000">
+                    </div>
+                    <div class="col-md-3">
+                      <label>Cor da borda</label>
+                      <input type="color" id="inputBorderColor" class="form-control form-control-color" value="#cccccc">
+                    </div>
+                    <div class="col-md-3">
+                      <label>Tamanho da fonte (px)</label>
+                      <input type="number" id="inputFontSize" class="form-control" value="14">
+                    </div>
+                  </div>
+                </div>
+              </div>
+         <!-- Rodapé -->
+         <div class="form-section">
+            <h5 onclick="toggleSection(this)">Rodapé</h5>
+            <div class="section-content">
+               <div class="mb-3">
+                  <label class="form-label">Texto do rodapé</label>
+                  <input type="text" id="footerText" class="form-control" placeholder="Texto do rodapé">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor de fundo</label>
+                  <input type="color" id="footerBgColor" class="form-control form-control-color" value="#343a40">
+               </div>
+               <div class="mb-3">
+                  <label class="color-label">Cor do texto</label>
+                  <input type="color" id="footerFontColor" class="form-control form-control-color" value="#ffffff">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Tamanho da fonte</label>
+                  <input type="number" id="footerFontSize" class="form-control" value="12" min="8" max="72">
+               </div>
+               <div class="mb-3">
+                  <label class="form-label">Alinhamento</label>
+                  <select id="footerAlign" class="form-select">
+                     <option value="center">Centralizado</option>
+                     <option value="left">Esquerda</option>
+                     <option value="right">Direita</option>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <!-- Botões -->
+         <div class="d-grid gap-2 d-md-block mt-4">
+            <button class="btn btn-outline-primary mb-2" onclick="mostrarCodigo()">Gerar Código</button>
+            <button class="btn btn-outline-secondary mb-2" onclick="salvarLocal()">Salvar</button>
+            <button class="btn btn-outline-info mb-2" onclick="carregarLocal()">Carregar</button>
+            <button class="btn btn-outline-danger mb-2" onclick="limparLocal()">Limpar</button>
+         </div>
+      </div>
+      <div id="main-content">
+         <div id="preview-container">
+            <div id="preview">
+               <p class="text-muted">Pré-visualização aparecerá aqui</p>
+            </div>
+         </div>
+         <div class="mb-3">
+            <label class="form-label">Código HTML Gerado:</label>
+            <textarea id="codigoHtml" class="form-control" spellcheck="false" rows="8"></textarea>
+         </div>
+      </div>
+      <!-- Botão fixo de atualizar -->
+      <button class="btn btn-primary update-btn" onclick="atualizarPreview()">Atualizar Visualização</button>
+      <script>
+         let headerImgURL = '';
+         let menuImgURL = '';
+         let formFields = [];
+         
+         // Carrega imagens
+         document.getElementById('headerImg').addEventListener('change', e => {
+           const file = e.target.files[0];
+           if (file) {
+             const reader = new FileReader();
+             reader.onload = e => headerImgURL = e.target.result;
+             reader.readAsDataURL(file);
+           }
+         });
+         
+         document.getElementById('menuImg').addEventListener('change', e => {
+           const file = e.target.files[0];
+           if (file) {
+             const reader = new FileReader();
+             reader.onload = e => menuImgURL = e.target.result;
+             reader.readAsDataURL(file);
+           }
+         });
+         
+         // Toggle sidebar
+         function toggleSidebar() {
+           document.getElementById('sidebar').classList.toggle('collapsed');
+         }
+         
+         // Toggle sections
+         function toggleSection(element) {
+           element.parentElement.classList.toggle('expanded');
+         }
+         
+         // Adiciona campo ao formulário
+         function addFormField(type = 'text', label = '') {
+           const id = 'field_' + Date.now();
+           const field = { id, type, label };
+           formFields.push(field);
+           renderFormFields();
+         }
+         
+         // Remove campo do formulário
+         function removeFormField(id) {
+           formFields = formFields.filter(f => f.id !== id);
+           renderFormFields();
+         }
+         
+         // Atualiza campo do formulário
+         function updateFormField(id, property, value) {
+           const field = formFields.find(f => f.id === id);
+           if (field) {
+             field[property] = value;
+           }
+         }
+         
+         // Renderiza campos do formulário
+         function renderFormFields() {
+           const container = document.getElementById('formFieldsContainer');
+           container.innerHTML = '';
+           
+           // Faz com que cada elemento do formulário, 'field = Campo', seja adicionado a div destes campos (FiedDiv) 
+           formFields.forEach(field => {
+             const fieldDiv = document.createElement('div');
+             fieldDiv.className = 'form-field';
+             fieldDiv.innerHTML = `
+               <select class="form-select" onchange="updateFormField('${field.id}', 'type', this.value)">
+                 <option value="text" ${field.type === 'text' ? 'selected' : ''}>Texto</option>
+                 <option value="email" ${field.type === 'email' ? 'selected' : ''}>E-mail</option>
+                 <option value="password" ${field.type === 'password' ? 'selected' : ''}>Senha</option>
+                 <option value="date" ${field.type === 'date' ? 'selected' : ''}>Data</option>
+                 <option value="number" ${field.type === 'number' ? 'selected' : ''}>Número</option>
+                 <option value="tel" ${field.type === 'tel' ? 'selected' : ''}>Telefone</option>
+                 <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+                 <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Área de texto</option>
+               </select>
+               <input type="text" class="form-control" value="${field.label || ''}" 
+                      onchange="updateFormField('${field.id}', 'label', this.value)" placeholder="Rótulo">
+               <button class="btn btn-sm btn-danger" onclick="removeFormField('${field.id}')">×</button>
+             `;
+             container.appendChild(fieldDiv);
+           });
+         }
+         
+         // Atualiza a pré-visualização 
+         function atualizarPreview() {
+           let html = '';
+         
+            // Cabeçalho
+            const ht = document.getElementById('headerText').value.trim();
+           const hbg = document.getElementById('headerBg').value;
+           const htc = document.getElementById('headerTextColor').value;
+           const hbdr = document.getElementById('headerBorder').value;
+           const halign = document.getElementById('headerAlign').value;
+           const hfontSize = document.getElementById('headerFontSize').value;
+         
+             // Se tiver informações para atualizar, atualiza o html
+           if (ht || headerImgURL) {
+             html += `<header style="background:${hbg}; color:${htc}; border:${hbdr}; text-align:${halign}; padding:20px;">`;
+             if (headerImgURL) html += `<img alt="Imagem do Cabeçalho" src="${headerImgURL}" style="max-height:100px; margin:10px auto; display:block">`;
+             if (ht) html += `<h1 style="font-size:${hfontSize}px">${ht}</h1>`;
+             html += `</header>`;
+           }
+         
+           // Menu 
+           const menuItems = document.getElementById('menuItems').value.split(',').map(i => i.trim()).filter(Boolean);
+           const menuBg = document.getElementById('menuBgColor').value;
+           const menuTextColor = document.getElementById('menuTextColor').value;
+         
+         // Se tiver informações para atualizar, atualiza o html
+         
+           if (menuImgURL || menuItems.length) {  // Alterado esta condição
+             html += `<nav style="background:${menuBg}; padding:10px; color:${menuTextColor}; display:flex; align-items:center; gap:10px;">`;
+             if (menuImgURL) html += `<img alt="Imagem do menu" src="${menuImgURL}" style="height:40px">`;
+             if (menuItems.length) html += menuItems.map(i => `<span class='menu-item'>${i}</span>`).join('');
+             html += '</nav>';
+           }
+         
+           // Galeria
+            const galStr = document.getElementById('galleryItems').value.trim();
+            const galBg = document.getElementById('galleryCardBg').value;
+            const galTextColor = document.getElementById('galleryTextColor')?.value || '#000000';
+            const galBorderColor = document.getElementById('galleryBorderColor')?.value || '#cccccc';
+            const galFontSize = document.getElementById('galleryFontSize')?.value || '14';
+            const galPadding = document.getElementById('galleryPadding')?.value || '10';
+
+            if (galStr) {
+            html += '<section class="d-flex flex-wrap gap-3 mt-3">';
+            galStr.split(';').forEach(card => {
+                const [url, desc] = card.split('|');
+                if (url || desc) {
+                html += `<div class='card' style='background:${galBg}; color:${galTextColor}; border:1px solid ${galBorderColor}; font-size:${galFontSize}px; padding:${galPadding}px;'>`;
+                if (url) html += `<img alt="Imagem da galeria" src='${url}' class='card-img-top'>`;
+                if (desc) html += `<div class='card-body'><p>${desc}</p></div>`;
+                html += '</div>';
+                }
+            });
+            html += '</section>';
+            }
+
+         
+           // Formulário
+           const formTitle = document.getElementById('formTitle').value.trim();
+           const formBg = document.getElementById('formBgColor').value;
+         
+          // Se tiver informações para atualizar, atualiza o html
+         
+           if (formFields.length || formTitle) {
+             html += `<form style='background:${formBg}; padding:15px;' class='mt-4'>`;
+             if (formTitle) html += `<h3>${formTitle}</h3>`;
+         
+             // Foreach para cada tipo de campo
+         
+             const labelTextColor = document.getElementById('labelTextColor')?.value || '#000000';
+                const labelFontSize = document.getElementById('labelFontSize')?.value || '14';
+
+                const inputBgColor = document.getElementById('inputBgColor')?.value || '#ffffff';
+                const inputTextColor = document.getElementById('inputTextColor')?.value || '#000000';
+                const inputBorderColor = document.getElementById('inputBorderColor')?.value || '#cccccc';
+                const inputFontSize = document.getElementById('inputFontSize')?.value || '14';
+
+                formFields.forEach(field => {
+                const labelStyle = `color:${labelTextColor}; font-size:${labelFontSize}px;`;
+                const inputStyle = `background:${inputBgColor}; color:${inputTextColor}; border:1px solid ${inputBorderColor}; font-size:${inputFontSize}px;`;
+
+                if (field.type === 'textarea') {
+                    html += `
+                    <div class='mb-2'>
+                        <label class='form-label' style="${labelStyle}">${field.label}</label>
+                        <textarea class='form-control' style="${inputStyle}"></textarea>
+                    </div>`;
+                } else if (field.type === 'checkbox') {
+                    html += `
+                    <div class='mb-2 form-check'>
+                        <input type='checkbox' class='form-check-input' id='${field.id}' style="${inputStyle}">
+                        <label class='form-check-label' for='${field.id}' style="${labelStyle}">${field.label}</label>
+                    </div>`;
+                } else {
+                    html += `
+                    <div class='mb-2'>
+                        <label class='form-label' style="${labelStyle}">${field.label}</label>
+                        <input type='${field.type}' class='form-control' style="${inputStyle}">
+                    </div>`;
+                }
+                });
+            }
+         
+           // Rodapé
+           const rodText = document.getElementById('footerText').value.trim();
+           const rodBg = document.getElementById('footerBgColor').value;
+           const rodFont = document.getElementById('footerFontColor').value;
+           const rodAlign = document.getElementById('footerAlign').value;
+           const rodFontSize = document.getElementById('footerFontSize').value + 'px';
+         
+           // Se tiver informações para atualizar, atualiza o html
+         
+           if (rodText) {
+             html += `<footer style='background:${rodBg}; color:${rodFont}; text-align:${rodAlign}; font-size:${rodFontSize}; padding:10px;' class='mt-4'>${rodText}</footer>`;
+         }
+         
+           document.getElementById('preview').innerHTML = html || '<p class="text-muted">Nada para mostrar ainda...</p>';
+         }
+         
+         
+          // Função que gera o html completo gerado
+         
+         function mostrarCodigo() {
+           const html = document.getElementById('preview').innerHTML;
+           const completo = `<!DOCTYPE html>\n<html lang='pt-br'>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<title>Título da Página</title>\n<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">\n</head>\n<body>\n${html}\n</body>\n</html>`;
+           document.getElementById('codigoHtml').value = completo;
+         }
+         
+         //Função para salvar no localStorage
+         
+         function salvarLocal() {
+         mostrarCodigo();
+         // Todos os dados salvos neste objeto
+         const data = {
+         html: document.getElementById('codigoHtml').value,
+         formFields,
+         headerImgURL,
+         menuImgURL,
+         styles: {
+           headerText: document.getElementById('headerText').value,
+           headerFontSize: document.getElementById('headerFontSize').value,
+           headerBg: document.getElementById('headerBg').value,
+           headerTextColor: document.getElementById('headerTextColor').value,
+           headerBorder: document.getElementById('headerBorder').value,
+           headerAlign: document.getElementById('headerAlign').value,
+           menuItems: document.getElementById('menuItems').value,
+           menuBgColor: document.getElementById('menuBgColor').value,
+           menuTextColor: document.getElementById('menuTextColor').value,
+           galleryTextColor: document.getElementById('galleryTextColor').value,
+           galleryBorderColor: document.getElementById('galleryBorderColor').value,
+           galleryFontSize: document.getElementById('galleryFontSize').value,
+           galleryPadding: document.getElementById('galleryPadding').value,
+           galleryItems: document.getElementById('galleryItems').value,
+           galleryCardBg: document.getElementById('galleryCardBg').value,
+           formTitle: document.getElementById('formTitle').value,
+           labelTextColor: document.getElementById('labelTextColor').value,
+            labelFontSize: document.getElementById('labelFontSize').value,
+            inputBgColor: document.getElementById('inputBgColor').value,
+            inputTextColor: document.getElementById('inputTextColor').value,
+            inputBorderColor: document.getElementById('inputBorderColor').value,
+            inputFontSize: document.getElementById('inputFontSize').value,
+           formBgColor: document.getElementById('formBgColor').value,
+           footerText: document.getElementById('footerText').value,
+           footerBgColor: document.getElementById('footerBgColor').value,
+           footerFontColor: document.getElementById('footerFontColor').value,
+           footerAlign: document.getElementById('footerAlign').value,
+         }
+         };
+         localStorage.setItem('paginaHTML', JSON.stringify(data));
+
+         // Exibir sucesso
+
+         alert("Html salvo com sucesso.");
+         }
+         
+         // Carrega localStorage
+
+         function carregarLocal() {
+         const salvo = localStorage.getItem('paginaHTML');
+         if (salvo) {
+         const data = JSON.parse(salvo);
+         
+         document.getElementById('codigoHtml').value = data.html;
+         if (data.formFields) {
+           formFields = data.formFields;
+           renderFormFields();
+         }
+         if (data.headerImgURL) headerImgURL = data.headerImgURL;
+         if (data.menuImgURL) menuImgURL = data.menuImgURL;
+         
+         if (data.styles) {
+           const s = data.styles;
+           document.getElementById('headerText').value = s.headerText;
+           document.getElementById('headerBg').value = s.headerBg;
+           document.getElementById('headerTextColor').value = s.headerTextColor;
+           document.getElementById('headerBorder').value = s.headerBorder;
+           document.getElementById('headerAlign').value = s.headerAlign;
+           document.getElementById('headerFontSize').value = s.headerFontSize || "30";
+         
+           document.getElementById('menuItems').value = s.menuItems;
+           document.getElementById('menuBgColor').value = s.menuBgColor;
+           document.getElementById('menuTextColor').value = s.menuTextColor; 
+           document.getElementById('galleryTextColor').value = s.galleryTextColor;
+            document.getElementById('galleryBorderColor').value = s.galleryBorderColor;
+            document.getElementById('galleryFontSize').value = s.galleryFontSize;
+            document.getElementById('galleryPadding').value = s.galleryPadding;
+
+           document.getElementById('galleryItems').value = s.galleryItems;
+           document.getElementById('galleryCardBg').value = s.galleryCardBg;
+         
+           document.getElementById('formTitle').value = s.formTitle;
+           document.getElementById('formBgColor').value = s.formBgColor;
+           document.getElementById('labelTextColor').value = s.labelTextColor;
+            document.getElementById('labelFontSize').value = s.labelFontSize;
+            document.getElementById('inputBgColor').value = s.inputBgColor;
+            document.getElementById('inputTextColor').value = s.inputTextColor;
+            document.getElementById('inputBorderColor').value = s.inputBorderColor;
+            document.getElementById('inputFontSize').value = s.inputFontSize;
+
+           document.getElementById('footerText').value = s.footerText;
+           document.getElementById('footerBgColor').value = s.footerBgColor;
+           document.getElementById('footerFontColor').value = s.footerFontColor;
+           document.getElementById('footerAlign').value = s.footerAlign;
+         }
+         // Formatação feita para o formato correto
+
+         document.getElementById('preview').innerHTML = data.html
+           .replace(/^[\s\S]*<body>/i, '')
+           .replace(/<\/body>[\s\S]*$/i, '');
+         alert("Html carregado com sucesso.")
+         }
+         }
+         
+         
+         function limparLocal() {
+           localStorage.removeItem('paginaHTML');
+           document.getElementById('codigoHtml').value = '';
+           formFields = [];
+           renderFormFields();
+           document.getElementById('preview').innerHTML = '<p class="text-muted">Pré-visualização aparecerá aqui</p>';
+         }
+         
+         // Inicia com todas as seções recolhidas
+         document.querySelectorAll('.form-section').forEach(section => {
+           section.classList.remove('expanded');
+         });
+      </script>
+   </body>
+</html>
